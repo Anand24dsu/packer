@@ -1,7 +1,9 @@
 pipeline {
     agent any
 
-
+    environment {
+        HOME = '/var/lib/jenkins'
+    }
 
     stages {
         stage('Clone Repo') {
