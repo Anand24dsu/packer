@@ -15,7 +15,7 @@ pipeline {
                 ls -lrt
                 cd yugabyte
                 packer --version
-                packer init yugabyte_docker.pkr.hcl
+                packer init aws-ubuntu.pkr.hcl
                 '''
             }
         }
@@ -24,7 +24,7 @@ pipeline {
             steps {
                 sh '''
                 cd yugabyte
-                packer build yugabyte_docker.pkr.hcl
+                packer build aws-ubuntu.pkr.hcl
                 '''
             }
         }
