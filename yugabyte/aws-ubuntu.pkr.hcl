@@ -53,12 +53,6 @@ build {
   }
 }
 
-post-processor "local-exec" {
-  inline = [
-    "echo 'Image successfully created'"
-  ]
-}
-
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
 }
