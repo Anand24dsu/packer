@@ -1,0 +1,62 @@
+{
+    "builders": [
+      {
+        "name": "learn-packer",
+        "type": "amazon-ebs",
+        "ami_name": "learn-packer-linux-aws-yugabyte",
+        "instance_type": "t3.micro",
+        "region": "us-west-2",
+        "source_ami_filter": {
+          "filters": {
+            "name": "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*",
+            "root-device-type": "ebs",
+            "virtualization-type": "hvm"
+          },
+          "most_recent": true,
+          "owners": ["099720109477"]
+        },
+        "ssh_username": "ubuntu",
+        "tags": {
+          "Name": "learn-packer-instance",
+          "Environment": "development"
+        }
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "inline": [
+          "export DEBIAN_FRONTEND=noninteractive",
+          "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections",
+          "sudo apt-get update",
+          "sudo apt-get upgrade -y",
+          "sudo apt-get install -y wget gnupg2 lsb-release python-is-python3",
+          "wget https://downloads.yugabyte.com/releases/2024.2.1.0/yugabyte-2024.2.1.0-b185-linux-x86_64.tar.gz",
+          "tar xvfz yugabyte-2024.2.1.0-b185-linux-x86_64.tar.gz",
+          "cd yugabyte-2024.2.1.0",
+          "./bin/post_install.sh",
+          "./bin/yugabyted start",
+          "./bin/yugabyted status",
+          "echo 'Provisioning complete'"
+        ]
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "echo 'This is Yugabyte DB setup complete'"
+        ]
+      }
+    ],
+    "post-processors": [
+      {
+        "type": "shell-local",
+        "inline": [
+          "if [ $? -eq 0 ]; then echo 'Image successfully created'; else echo 'Image creation failed'; fi"
+        ]
+      }
+    ],
+    "variables": {
+      "timestamp": "${regex_replace(timestamp(), \"[- TZ:]\", \"\")}"
+    }
+  }
+  

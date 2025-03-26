@@ -1,0 +1,90 @@
+{
+    "build": [
+        {
+            "post-processor": {
+                "shell-local": [
+                    {
+                        "inline": [
+                            "echo 'Image successfully created'"
+                        ]
+                    }
+                ]
+            },
+            "provisioner": {
+                "file": [
+                    {
+                        "destination": "/tmp/install_yba.sh",
+                        "source": "install_yba.sh"
+                    }
+                ],
+                "shell": [
+                    {
+                        "inline": [
+                            "chmod +x /tmp/install_yba.sh",
+                            "sudo /tmp/install_yba.sh"
+                        ]
+                    },
+                    {
+                        "inline": [
+                            "echo 'This is Yugabyte DB setup complete'"
+                        ]
+                    }
+                ]
+            },
+            "sources": [
+                "source.amazon-ebs.yugabyte"
+            ]
+        }
+    ],
+    "source": {
+        "amazon-ebs": {
+            "yugabyte": [
+                {
+                    "ami_name": "yugabytedb-ami-${var.timestamp}",
+                    "associate_public_ip_address": true,
+                    "instance_type": "${var.instance_type}",
+                    "launch_block_device_mappings": [
+                        {
+                            "delete_on_termination": true,
+                            "device_name": "/dev/sda1",
+                            "volume_size": 250,
+                            "volume_type": "gp3"
+                        }
+                    ],
+                    "region": "${var.region}",
+                    "source_ami": "${var.source_ami}",
+                    "ssh_username": "ubuntu",
+                    "tags": {
+                        "Architecture": "x86_64",
+                        "Name": "Latest_Yugabyte_Anywhere_AMI"
+                    }
+                }
+            ]
+        }
+    },
+    "variable": {
+        "instance_type": [
+            {
+                "default": "c5a.xlarge",
+                "type": "${string}"
+            }
+        ],
+        "region": [
+            {
+                "default": "us-west-2",
+                "type": "${string}"
+            }
+        ],
+        "source_ami": [
+            {
+                "default": "ami-00c257e12d6828491",
+                "type": "${string}"
+            }
+        ],
+        "timestamp": [
+            {
+                "default": "${formatdate(\"YYYYMMDDHHmmss\", timestamp())}"
+            }
+        ]
+    }
+}

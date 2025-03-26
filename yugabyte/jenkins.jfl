@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    environment {
+        HOME = '/var/lib/jenkins'
+    }
+
+    stages {
+
+        stage('Initialize Packer') {
+            steps {
+                sh '''
+                echo "HOME is: $HOME"
+                whoami
+                ls -lrt
+                cd yugabyte
+                packer --version
+                packer init yugabyte_docker.pkr.hcl
+                '''
+            }
+        }
+
+        stage('Build YugabyteDB Image') {
+            steps {
+                sh '''
+                cd yugabyte
+                packer build yugabyte_docker.pkr.hcl
+                '''
+            }
+        }
+    }
+}
